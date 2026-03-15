@@ -90,7 +90,7 @@ def handler(event, context):
             "Content-Type": "application/json",
             "x-api-key": EMAIL_API_KEY
         }
-        response = requests.post(EMAIL_API_KEY, json=payload, headers=headers)
+        response = requests.post(url=EMAIL_API_ENDPOINT, json=payload, headers=headers)
         response.raise_for_status()
 
         return {"status": "success", "message": "Email request sent to API"}
