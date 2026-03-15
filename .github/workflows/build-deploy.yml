@@ -8,6 +8,9 @@ jobs:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
     if: github.ref_name == 'develop'
+    outputs:
+      REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      short-sha: ${{ steps.short-sha.outputs.sha }}
 
     steps:
       - name: Checkout
@@ -38,3 +41,24 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+  deploy:
+      name: Update Lambda Image
+      runs-on: ubuntu-latest
+      needs: build
+      environment: production
+
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: af-south-1
+        - name: Update Lambda Container Image
+          run: |
+            aws lambda update-function-code \
+            --function-name market-data \
+            --image-uri ${{ needs.build.outputs.REGISTRY }}:${{ needs.build.outputs.short_sha }}
