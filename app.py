@@ -5,8 +5,8 @@ import boto3
 from datetime import datetime, timedelta
 
 POLYGON_API_KEY = os.environ.get("POLYGON_API_KEY")
-EMAIL_API_KEY = os.environ.get("EMAIL_API_KEY")
-EMAIL_API_ENDPOINT = os.environ.get("EMAIL_API_ENDPOINT")
+EMAIL_SERVICE_API_KEY = os.environ.get("EMAIL_SERVICE_API_KEY")
+EMAIL_API_URL = os.environ.get("EMAIL_API_URL")
 CONFIG_TABLE = os.environ.get("CONFIG_TABLE")
 
 dynamodb = boto3.resource("dynamodb")
@@ -88,9 +88,9 @@ def handler(event, context):
 
         headers = {
             "Content-Type": "application/json",
-            "x-api-key": EMAIL_API_KEY
+            "x-api-key": EMAIL_SERVICE_API_KEY
         }
-        response = requests.post(url=EMAIL_API_ENDPOINT, json=payload, headers=headers)
+        response = requests.post(url=EMAIL_API_URL, json=payload, headers=headers)
         response.raise_for_status()
 
         return {"status": "success", "message": "Email request sent to API"}
