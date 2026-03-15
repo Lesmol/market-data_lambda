@@ -60,5 +60,5 @@ jobs:
         - name: Update Lambda Container Image
           run: |
             aws lambda update-function-code \
-            --function-name market-data \
+            --function-name market-data-function \
             --image-uri ${{ needs.build.outputs.REGISTRY }}:${{ needs.build.outputs.short_sha }}
