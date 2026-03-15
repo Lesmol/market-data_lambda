@@ -10,7 +10,7 @@ jobs:
     if: github.ref_name == 'develop'
     outputs:
       REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      short-sha: ${{ steps.short-sha.outputs.sha }}
+      short_sha: ${{ steps.short-sha.outputs.sha }}
 
     steps:
       - name: Checkout
