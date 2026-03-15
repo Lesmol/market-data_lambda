@@ -5,12 +5,9 @@ import boto3
 from datetime import datetime, timedelta
 
 POLYGON_API_KEY = os.environ.get("POLYGON_API_KEY")
-
 EMAIL_API_KEY = os.environ.get("EMAIL_API_KEY")
 EMAIL_API_ENDPOINT = os.environ.get("EMAIL_API_ENDPOINT")
-
-RECIPIENTS_TABLE = os.environ.get("RECIPIENTS_TABLE")
-TICKERS_TABLE = os.environ.get("TICKERS_TABLE")
+CONFIG_TABLE = os.environ.get("CONFIG_TABLE")
 
 dynamodb = boto3.resource("dynamodb")
 
@@ -33,8 +30,8 @@ def get_past_market_date():
     return date
 
 
-def get_values_from_db(table_name, key_name):
-    table = dynamodb.Table(table_name)
+def get_values_from_db(key_name):
+    table = dynamodb.Table(CONFIG_TABLE)
     try:
         response = table.get_item(Key={'id': key_name})
         return response.get('Item', {}).get('values', [])
@@ -46,8 +43,8 @@ def get_values_from_db(table_name, key_name):
 def handler(event, context):
     current_date_str = get_current_market_date().strftime("%Y-%m-%d")
     past_date_str = get_past_market_date().strftime("%Y-%m-%d")
-    tickers = get_values_from_db(TICKERS_TABLE, "tickers")
-    recipients = get_values_from_db(RECIPIENTS_TABLE, "email_subscribers")
+    tickers = get_values_from_db("tickers")
+    recipients = get_values_from_db("email_subscribers")
     stock_data_list = []
     api_call_count = 0
 
